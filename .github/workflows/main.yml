@@ -11,24 +11,16 @@ on:
       - edited
       - labeled
       - unlabeled
-
 jobs:
-  check-label:
+  verify-labels:
     runs-on: ubuntu-latest
+    name: Verify labels
+    if: github.event.pull_request.merged == false
     steps:
-      - name: Check if PR has a release label
-        if: |
-          (
-            (contains(github.event.pull_request.labels.*.name, 'release:- feature')) ||
-            (contains(github.event.pull_request.labels.*.name, 'release:- bug-fix')) ||
-            (contains(github.event.pull_request.labels.*.name, 'release:- hot-fix')) ||
-            (contains(github.event.pull_request.labels.*.name, 'release:- sprint-deliverables')) ||
-            (contains(github.event.pull_request.labels.*.name, 'release:- ignore'))
-          )
-        run: |
-          echo "This PR has a release label"
-          exit 0
-      - name: No release label found
-        run: |
-          echo "This PR doesn't have a release label"
-          exit 1
+      - uses: actions/checkout@v3
+      - name: Verify labels
+        id: action-verify-labels
+        uses: mauroalderete/action-verify-labels@v1
+        with:
+          github-token: ${{ secrets.TOKEN }}
+          some: 'release: feature'
