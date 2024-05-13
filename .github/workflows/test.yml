@@ -18,11 +18,13 @@ jobs:
     steps:
       - name: Check if PR has a release label
         if: |
-          contains(github.event.pull_request.labels.*.name, 'release:- feature') == 'true' ||
-          contains(github.event.pull_request.labels.*.name, 'release:- bug-fix') == 'true' ||
-          contains(github.event.pull_request.labels.*.name, 'release:- hot-fix') == 'true' ||
-          contains(github.event.pull_request.labels.*.name, 'release:- sprint-deliverables') == 'true' ||
-          contains(github.event.pull_request.labels.*.name, 'release:- ignore') == 'true'
+          (
+            (contains(github.event.pull_request.labels.*.name, 'release:- feature') == 'true') ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- bug-fix') == 'true') ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- hot-fix') == 'true') ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- sprint-deliverables') == 'true') ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- ignore') == 'true')
+          )
         run: |
           echo "This PR has a release label"
           exit 0
