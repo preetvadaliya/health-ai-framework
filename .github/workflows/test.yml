@@ -17,9 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check if PR has a release label
-        if: |
-          ${{ contains(github.event.pull_request.labels.*.name, 'release: hot-fix') || contains(github.event.pull_request.labels.*.name, 'release: feature') || contains(github.event.pull_request.labels.*.name, 'release: bug-fix') || contains(github.event.pull_request.labels.*.name, 'release: sprint-deliverables') || contains(github.event.pull_request.labels.*.name, 'release: ignore') }}
+        if: ${{ !contains(github.event.pull_request.labels.*.name, "release:hot-fix") }}
         run: |
           echo "This PR has a release label"
-          exit 0
+          exit 1
 
