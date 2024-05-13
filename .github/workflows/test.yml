@@ -1,13 +1,25 @@
-name: Check PR Label
+name: Check release draft
 
 on:
   pull_request:
-       types: [opened, labeled, unlabeled, synchronize]
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - labeled
+      - unlabeled
+
 jobs:
-  check_label:
+  check-label:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if PR has specific label
-        uses: NathanielHill/check-pr-label-action@v4.0.0
-        with:
-          valid-labels: 'bug, enhancement'
+      - name: Check if PR has a release label
+        if: >
+          contains(github.event.pull_request.labels.*.name, 'test')
+        run: |
+          echo "This PR has a release label"
+          exit 0
+
