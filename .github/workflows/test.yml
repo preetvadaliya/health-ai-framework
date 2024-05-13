@@ -1,4 +1,5 @@
 name: Check release draft
+
 on:
   pull_request:
     branches:
@@ -13,12 +14,15 @@ on:
 
 jobs:
   check-label:
-    if: |
-      ${{contains(github.event.pull_request.labels.*.name, 'release: hot-fix') || contains(github.event.pull_request.labels.*.name, 'release: feature') || contains(github.event.pull_request.labels.*.name, 'release: bug-fix') || contains(github.event.pull_request.labels.*.name, 'release: sprint-deliverables') || contains(github.event.pull_request.labels.*.name, 'release: ignore')}}
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if PR does not have a release label
+      - name: Check labels on PR
         run: |
-          echo "This PR does not have a release label"
-          exit 1
-          
+          labels="${{ github.event.pull_request.labels.*.name }}"
+          if [[ $labels == *"release: hot-fix"* || $labels == *"release: feature"* || $labels == *"release: bug-fix"* || $labels == *"release: sprint-deliverables"* || $labels == *"release: ignore"* ]]; then
+            echo "At least one valid release label found. Merge allowed."
+          else
+            echo "No valid release label found. Merge blocked."
+            exit 1
+          fi
+      
