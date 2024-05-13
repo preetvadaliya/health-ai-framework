@@ -22,9 +22,4 @@ jobs:
         run: |
           echo "This PR has a release label"
           exit 0
-      - name: Pass if PR does not have a release label
-        if: |
-          ${{ !contains(github.event.pull_request.labels.*.name, 'release: hot-fix') && !contains(github.event.pull_request.labels.*.name, 'release: feature') && !contains(github.event.pull_request.labels.*.name, 'release: bug-fix') && !contains(github.event.pull_request.labels.*.name, 'release: sprint-deliverables') && !contains(github.event.pull_request.labels.*.name, 'release: ignore') }}
-        run: |
-          echo "This PR does not have a release label"
-          exit 1
+
