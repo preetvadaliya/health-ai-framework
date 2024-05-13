@@ -1,23 +1,34 @@
-name: Code Formatting and Linting
+name: Check release draft
+
 on:
   pull_request:
     branches:
       - main
     types:
       - opened
+      - reopened
       - synchronize
+      - edited
+      - labeled
+      - unlabeled
+
 jobs:
-  check:
+  check-label:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v4
-        with:
-          cache: true
-      - name: Install project dependencies
+      - name: Check if PR has a release label
+        if: |
+          (
+            (contains(github.event.pull_request.labels.*.name, 'release:- feature')) ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- bug-fix')) ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- hot-fix')) ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- sprint-deliverables')) ||
+            (contains(github.event.pull_request.labels.*.name, 'release:- ignore'))
+          )
         run: |
-          pdm install
-      - name: Run Prettify (Code Formatting and Linting)
-        run: pdm run prettify
+          echo "This PR has a release label"
+          exit 0
+      - name: No release label found
+        run: |
+          echo "This PR doesn't have a release label"
+          exit 1
