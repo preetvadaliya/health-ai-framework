@@ -1,0 +1,24 @@
+name: Check release draft
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - labeled
+      - unlabeled
+
+jobs:
+  check-label:
+    if: |
+      ${{contains(github.event.pull_request.labels.*.name, 'release: hot-fix') || contains(github.event.pull_request.labels.*.name, 'release: feature') || contains(github.event.pull_request.labels.*.name, 'release: bug-fix') || contains(github.event.pull_request.labels.*.name, 'release: sprint-deliverables') || contains(github.event.pull_request.labels.*.name, 'release: ignore')}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if PR does not have a release label
+        run: |
+          echo "This PR does not have a release label"
+          exit 1
+          
