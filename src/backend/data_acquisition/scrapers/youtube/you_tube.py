@@ -67,7 +67,7 @@ class YouTube:
         parts='id', for_username=user_name, return_json=True
       )
       if 'items' in res and res['items']:
-        channel_id = res['items'][0]['id']
+        channel_id = res['items'][0]["id"]
         cls.USER_CHANNEL_MAP[user_name] = channel_id
         write_file(cls.USER_CHANNEL_MAP_PATH, cls.USER_CHANNEL_MAP)
         return channel_id
