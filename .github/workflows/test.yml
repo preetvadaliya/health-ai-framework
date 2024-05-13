@@ -1,7 +1,9 @@
-name: 'Check Mergable by label ✅'
+name: Check release draft
 
 on:
   pull_request:
+    branches:
+      - main
     types:
       - opened
       - reopened
@@ -11,11 +13,18 @@ on:
       - unlabeled
 
 jobs:
-  fail-by-label:
-    if: contains(github.event.pull_request.labels.*.name, 'do not merge')
+  check-label:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if PR is labeled "do not merge"
+      - name: Check if PR has a release label
+        if: |
+          ${{ contains(github.event.pull_request.labels.*.name, 'release: hot-fix') || contains(github.event.pull_request.labels.*.name, 'release: feature') || contains(github.event.pull_request.labels.*.name, 'release: bug-fix') || contains(github.event.pull_request.labels.*.name, 'release: sprint-deliverables') || contains(github.event.pull_request.labels.*.name, 'release: ignore') }}
         run: |
-          echo "This PR is labeled as do not merge!"
+          echo "This PR has a release label"
+          exit 0
+      - name: Pass if PR does not have a release label
+        if: |
+          ${{ !contains(github.event.pull_request.labels.*.name, 'release: hot-fix') && !contains(github.event.pull_request.labels.*.name, 'release: feature') && !contains(github.event.pull_request.labels.*.name, 'release: bug-fix') && !contains(github.event.pull_request.labels.*.name, 'release: sprint-deliverables') && !contains(github.event.pull_request.labels.*.name, 'release: ignore') }}
+        run: |
+          echo "This PR does not have a release label"
           exit 1
