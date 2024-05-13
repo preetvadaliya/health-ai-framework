@@ -1,9 +1,7 @@
-name: Check release draft
+name: 'Check Mergable by label ✅'
 
 on:
   pull_request:
-    branches:
-      - main
     types:
       - opened
       - reopened
@@ -13,16 +11,11 @@ on:
       - unlabeled
 
 jobs:
-  check-label:
+  fail-by-label:
+    if: contains(github.event.pull_request.labels.*.name, 'do not merge')
     runs-on: ubuntu-latest
     steps:
-      - name: Check labels on PR
+      - name: Fail if PR is labeled "do not merge"
         run: |
-          labels="${{ github.event.pull_request.labels.*.name }}"
-          if [[ $labels == *"release: hot-fix"* || $labels == *"release: feature"* || $labels == *"release: bug-fix"* || $labels == *"release: sprint-deliverables"* || $labels == *"release: ignore"* ]]; then
-            echo "At least one valid release label found. Merge allowed."
-          else
-            echo "No valid release label found. Merge blocked."
-            exit 1
-          fi
-      
+          echo "This PR is labeled as do not merge!"
+          exit 1
