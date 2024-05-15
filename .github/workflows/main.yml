@@ -22,15 +22,14 @@ jobs:
           cache: true
       # Install only ruff as dependency
       - name: Install Ruff
-        run: pdm add ruff
+        run: pdm add -dG linting ruff
       - name: Get all changed file paths
         id: changes
         uses: tj-actions/changed-files@v44
-      - name: Run ruff on each file
+      - name: Run ruff on changed files
         env:
           CHANGED_FILES: ${{ steps.changes.outputs.all_changed_files }}
         run: |
           for file in ${CHANGED_FILES}; do
             ruff check $file --fix
           done
-          
