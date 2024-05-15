@@ -1,26 +1,36 @@
-name: Check release draft
+name: Code Formatting and Linting
 
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - edited
-      - labeled
-      - unlabeled
+    branches: [main]
+    types: [opened, reopened, synchronize, edited]
+    paths:
+      - '**/*.py'
+
 jobs:
-  verify-labels:
+  run-prettify:
     runs-on: ubuntu-latest
-    name: Verify labels
-    if: github.event.pull_request.merged == false
+    name: A job to verify python code style and linting
     steps:
-      - uses: actions/checkout@v3
-      - name: Verify labels
-        id: action-verify-labels
-        uses: mauroalderete/action-verify-labels@v1
+      # Checkout to repository
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Setup PDM
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
         with:
-          github-token: ${{ secrets.TOKEN }}
-          some: 'release: feature'
+          cache: true
+      # Install only ruff as dependency
+      - name: Install Ruff
+        run: pdm install ruff
+      - name: Get all changed file paths
+        id: changes
+        uses: tj-actions/changed-files@v44
+      - name: Run ruff on each file
+        env:
+          CHANGED_FILES: ${{ steps.changes.outputs.all_changed_files }}
+        run: |
+          for file in ${CHANGED_FILES}; do
+            ruff check $file --fix
+          done
+          
