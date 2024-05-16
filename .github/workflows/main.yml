@@ -26,6 +26,9 @@ jobs:
       - name: Get all changed file paths
         id: changes
         uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **.py
       - name: Activate virtualenv
         run: |
           . .venv/bin/activate
