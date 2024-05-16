@@ -1,0 +1,30 @@
+name-template: "Release for Sprint ${{ NEXT_SPRINT_NUMBER }}"
+tag-template: "sprint-${{ NEXT_SPRINT_NUMBER }}-release"
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+categories:
+  - title: "🚀 New Features"
+    collapse-after: 10
+    labels:
+      - "release: feature"
+  - title: "🐛 Bug Fixes"
+    collapse-after: 10
+    labels:
+      - "release: bug-fix"
+  - title: "📝 Sprint Deliverables"
+    collapse-after: 10
+    labels:
+      - "release: sprint-deliverables"
+  - title: "🔧 Maintenance"
+    collapse-after: 10
+    labels:
+      - "release: maintenance"
+  - title: "🔨 Refactor"
+    collapse-after: 10
+    labels:
+      - "release: refactor"
+template: |
+  ## 📬 Release notes of Sprint
+  
+  $CHANGES
+  ### Contributors
+  $CONTRIBUTORS
