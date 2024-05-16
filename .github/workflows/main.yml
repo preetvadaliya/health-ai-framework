@@ -1,42 +1,38 @@
-name: Code Formatting and Linting
+name: Release Drafter
 
 on:
   pull_request:
-    branches: [main]
-    types: [opened, reopened, synchronize, edited]
-    paths:
-      - '**/*.py'
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  run-prettify:
+  write-release-draft:
     runs-on: ubuntu-latest
-    name: A job to verify python code style and linting
     steps:
-      # Checkout to repository
       - name: Checkout
         uses: actions/checkout@v3
-      # Setup PDM
-      - name: Set up PDM
-        uses: pdm-project/setup-pdm@v4
+      - name: Get previous tag
+        id: tag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
         with:
-          cache: true
-      # Install only ruff as dependency
-      - name: Install Ruff
-        run: pdm add -dG linting ruff
-      - name: Get all changed file paths
-        id: changes
-        uses: tj-actions/changed-files@v44
-        with:
-          files: |
-            **.py
-      - name: Activate virtualenv
+          fallback: sprint-01-release
+      - name: run script
         run: |
-          . .venv/bin/activate
-            echo PATH=$PATH >> $GITHUB_ENV
-      - name: Run ruff on changed files
+          sprint_number=$(echo "${{ steps.tag.outputs.tag }}" | sed -E 's/^sprint-([0-9]+)-release$/\1/')
+          next_sprint_number=$((sprint_number + 1))
+          echo "NEXT_SPRINT_NUMBER=$next_sprint_number" >> $GITHUB_ENV
+      - name: Update release draft
+        uses: release-drafter/release-drafter@v6
         env:
-          CHANGED_FILES: ${{ steps.changes.outputs.all_changed_files }}
-        run: |
-          for file in ${CHANGED_FILES}; do
-            ruff check $file --fix
-          done
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
