@@ -1,26 +1,40 @@
-name: Code Formatting and Linting
+name: Release Drafter
+
 on:
   pull_request:
     branches:
       - main
     types:
       - opened
+      - reopened
+      - synchronize
+      - edited
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
-  check:
+  write-release-draft:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get previous tag
+        id: tag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
         with:
-          python-version: '3.10'
-      - name: Install PDM
+          fallback: sprint-01-release
+      - name: run script
         run: |
-          pip install pdm
-          pdm install
-      - name: Run Prettify (Code Formatting and Linting)
-        run: pdm run prettify
-        
+          sprint_number=$(echo "${{ steps.tag.outputs.tag }}" | sed -E 's/^sprint-([0-9]+)-release$/\1/')
+          next_sprint_number=$((sprint_number + 1))
+          echo "NEXT_SPRINT_NUMBER=$next_sprint_number" >> $GITHUB_ENV
+      - name: Update release draft
+        uses: release-drafter/release-drafter@v6
+        with:
+          config-name: release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
