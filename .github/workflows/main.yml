@@ -34,5 +34,7 @@ jobs:
           echo "NEXT_SPRINT_NUMBER=$next_sprint_number" >> $GITHUB_ENV
       - name: Update release draft
         uses: release-drafter/release-drafter@v6
+        with:
+          config-name: release-drafter.yml
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
